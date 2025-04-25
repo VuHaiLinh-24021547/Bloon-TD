@@ -1,0 +1,2 @@
+all:
+	g++ -Iinclude -Iinclude/sdl -Iinclude/headers -Llib -o Main src/btd6.cpp src/RenderWindow.cpp src/background.cpp src/bloon.cpp src/player.cpp src/timer.cpp src/monkey.cpp src/projectile.cpp -lmingw32 -lSDL2main -lSDL2 -lSDL2_image -lSDL2_ttf -lSDL2_mixer
