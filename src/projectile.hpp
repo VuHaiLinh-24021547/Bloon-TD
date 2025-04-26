@@ -20,6 +20,8 @@ class projectile{
         void move();
         void pop();
         bool destroy();
+        bool has_hit(bloon &b) { return b.has_hit; }
+        void mark_hit(bloon &b) { b.has_hit = true; }
     private:
         vectorR2 pos;
         SDL_Texture* tex;

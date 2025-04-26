@@ -23,8 +23,10 @@ class bloon
         bool alive();
         bool bloon_reach_end();
         void bloon_pop(player& p_player);
+        bool has_hit = false;
 
         SDL_Texture* tex;
+
     private:
         vectorR2 pos;
         SDL_Rect bloon_tex;

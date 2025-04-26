@@ -23,15 +23,16 @@ class monkey
         bool valid_place(const int &x, const int &y);
         void update_target(std::vector<bloon> &bloon_v);
         bool shoot(player &p_player);   
+        bool can_shoot;
         bloon* target = nullptr;
         int getRange();
         std::vector<projectile> dart_v;
-
+        void move(const int &x, const int &y);
     private:
         vectorR2 pos;
         SDL_Texture* tex;
         SDL_Rect monkey_tex;
-        float range = 100.0f;
+        float range = 150.0f;
         int cost = 50;
         int damage;
         int fire_cooldown = 100;

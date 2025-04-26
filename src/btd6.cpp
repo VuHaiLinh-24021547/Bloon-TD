@@ -54,10 +54,12 @@ int main(int argc, char *argv[]){
     //tạo ra dart
     SDL_Texture* dart_texture = window.loadTexture("res/gfx/dart_projectile.png");
     std::vector<projectile> dart_v;
+    bool dart_monkey_go_with_mouse = false;
 
     //timer
     timer spawn_timer(100);
     timer round_timer(10);
+    timer has_hit_timer(50);
 
     //tạo ra player
     player slimebuck(20, 75, 1);
@@ -79,14 +81,18 @@ int main(int argc, char *argv[]){
             }
 
             //đặt monkey
-            if(event.type == SDL_KEYDOWN) {
-                if(event.key.keysym.sym == SDLK_1) {
+            if(event.button.button == SDL_BUTTON_LEFT) {
+                if(mouse_x >= 1039 && mouse_x <= 1129 && mouse_y >= 315 && mouse_y <= 402) {
                     if(slimebuck.money < 50) continue;
                     else {
+                        dart_monkey_go_with_mouse = true;
                         monkey dart_monkey(vectorR2(mouse_x-30, mouse_y-30), dart_monkey_tex);
                         dart_monkey_v.push_back(dart_monkey);
                         slimebuck.modify_money(-50);
                     }
+                }
+                if(dart_monkey_go_with_mouse && mouse_x < 1000) {
+                    dart_monkey_go_with_mouse = false;
                 }
             }
 
@@ -101,6 +107,17 @@ int main(int argc, char *argv[]){
                         }
                     }
                 }
+            }
+        }
+
+        //cho dart monkey di chuyển theo chuột va chưa bắn khi chưa đặt
+        if (!dart_monkey_v.empty()) {
+            int last_monkey = dart_monkey_v.size() - 1;
+            if (dart_monkey_go_with_mouse) {
+                dart_monkey_v[last_monkey].move(mouse_x - 30, mouse_y - 30);
+                dart_monkey_v[last_monkey].can_shoot = false;
+            } else {
+                dart_monkey_v[last_monkey].can_shoot = true;
             }
         }
 
@@ -122,7 +139,7 @@ int main(int argc, char *argv[]){
                 create_bloon(bloon_count, 0, bloon_v, spawn_timer, 2);
                 break;
             case 3:
-                create_bloon(bloon_count, 3, bloon_v, spawn_timer, 1);
+                create_bloon(bloon_count, 7, bloon_v, spawn_timer, 1);
                 create_bloon(bloon_count, 0, bloon_v, spawn_timer, 3);
                 break;
             case 4:
@@ -197,9 +214,9 @@ int main(int argc, char *argv[]){
                 dart_monkey.update_target(bloon_v);
             }
 
-            //tạo ra dart khi dart monkey bắn
-            if(dart_monkey.shoot(slimebuck)) {
-                projectile darts(dart_monkey.getPos(), dart_texture, dart_monkey.target->getPos());
+            // tạo ra dart khi dart monkey bắn
+            if(dart_monkey.can_shoot && dart_monkey.shoot(slimebuck)) {
+                projectile darts(vectorR2(dart_monkey.getPos().x+30, dart_monkey.getPos().y+30), dart_texture, dart_monkey.target->getPos());
                 dart_v.push_back(darts);
             }
         }
@@ -212,17 +229,32 @@ int main(int argc, char *argv[]){
             }
         }
 
+        //kiểm tra va chạm giữa dart và bloon
         for(int i = 0; i < (int)dart_v.size(); i++) {
             for(int j = 0; j < (int)bloon_v.size(); j++) {
                 SDL_Rect dart_rect = { (int)dart_v[i].getPos().x, (int)dart_v[i].getPos().y, 20, 16 };
                 SDL_Rect bloon_rect = { (int)bloon_v[j].getPos().x, (int)bloon_v[j].getPos().y, 32, 40 };
 
-                if(SDL_HasIntersection(&dart_rect, &bloon_rect)) {
+                if(SDL_HasIntersection(&dart_rect, &bloon_rect) && !dart_v[i].has_hit(bloon_v[j])) {
                     bloon_v[j].bloon_pop(slimebuck);
                     dart_v[i].pop();
+                    dart_v[i].mark_hit(bloon_v[j]);
+
                     break;
                 }
             }
+        }
+        
+        //timer cho dart khi bắn trúng 1 bloon thì không gây damage lên 1 bloon đấy, dùng để fix bug 1 dart gây damage 2 lần 
+        for(int i=0; i<(int)bloon_v.size(); i++) {
+            if(bloon_v[i].has_hit) {
+                has_hit_timer.time_passed();
+                if(has_hit_timer.time_is_zero()) {
+                    bloon_v[i].has_hit = false;
+                    has_hit_timer.get_time_to_max();
+                }
+            }
+            else continue;
         }
 
         window.display();

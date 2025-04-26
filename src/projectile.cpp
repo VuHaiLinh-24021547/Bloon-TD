@@ -17,8 +17,8 @@ projectile::projectile(vectorR2 p_pos, SDL_Texture* p_tex, vectorR2 target_pos)
     dart_tex.w = dart_w;
     dart_tex.h = dart_h;
     
-    direction.x = target_pos.x - pos.x;
-    direction.y = target_pos.y - pos.y;
+    direction.x = (target_pos.x+16) - (pos.x+dart_w/2);
+    direction.y = (target_pos.y+20) - (pos.y+dart_h/2);
 }
 
 SDL_Texture* projectile::getTex() {
@@ -42,6 +42,6 @@ bool projectile::destroy() {
 }
 
 void projectile::move() {
-    pos.x += direction.x*2/abs(direction.x);
-    pos.y += direction.y*2/abs(direction.y);
+    pos.x += direction.x/20;
+    pos.y += direction.y/20;
 }

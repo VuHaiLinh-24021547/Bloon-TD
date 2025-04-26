@@ -54,11 +54,17 @@ void monkey::update_target(std::vector<bloon>& bloon_v) {
     target = closest;
 }
 
+void monkey::move(const int &x, const int &y) {
+    pos.x = x;
+    pos.y = y;
+}
+
 int monkey::getRange() {
     return range;
 }
 
 bool monkey::shoot(player& p_player) {
+    bool shoot = false;
     time_since_last_shot++;
 
     if(target && target->alive()) {
@@ -70,12 +76,11 @@ bool monkey::shoot(player& p_player) {
             if(time_since_last_shot >= fire_cooldown) {
                 time_since_last_shot = 0;
 
-                // target->bloon_pop(p_player);
 
                 if(!target->alive()) {
                     target = nullptr;
                 }
-                return true;
+                shoot = true;
             }
             else return false;
         }
@@ -86,6 +91,6 @@ bool monkey::shoot(player& p_player) {
     else {
         target = nullptr;
     }
-    return false;
+    return shoot;
 }
 
