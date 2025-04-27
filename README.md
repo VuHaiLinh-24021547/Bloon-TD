@@ -25,7 +25,6 @@ Các thư viện đi kèm: **SDL2**, **SDL2-image**, **SDL2-ttf** và **SDL2-mix
 # 1. Preview
 Demo Game: https://drive.google.com/file/d/1-NpA3aDIuyu5s53A1ogsZXZbd7Q99_vc/view?usp=drive_link
 
-![image](res/gfx/preview.png)
 # 2. Building And Running
   - Chạy file **main.exe** để chơi hoặc
   - Sử dụng [MinGW-w64](https://www.mingw-w64.org/) và các thư viện [SDL2](https://www.libsdl.org/) đi kèm để build file **main.cpp**. Chạy file vừa build được để chơi.
