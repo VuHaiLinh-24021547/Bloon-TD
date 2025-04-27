@@ -1,4 +1,4 @@
-# Gun-Bird - A small game made with C++ and SDL2.
+# Bloon TD - A small game made with C++ and SDL2.
 <p align="center">
     <strong> Bloon TD by Vu Hai Linh </strong>
 </p>
@@ -23,7 +23,7 @@
 Các thư viện đi kèm: **SDL2**, **SDL2-image**, **SDL2-ttf** và **SDL2-mixer**.
 
 # 1. Preview
-Demo Game: https://drive.google.com/file/d/1I8ygkfypsWRMt37Gz-gH2prm3f-seZQ4/view?usp=drive_link
+Demo Game: https://drive.google.com/file/d/1-NpA3aDIuyu5s53A1ogsZXZbd7Q99_vc/view?usp=drive_link
 
 ![image](res/gfx/preview.png)
 # 2. Building And Running

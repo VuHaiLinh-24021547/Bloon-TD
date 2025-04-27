@@ -69,7 +69,7 @@ int main(int argc, char *argv[]){
     //timer
     timer spawn_timer(100);
     timer round_timer(10);
-    timer has_hit_timer(30);
+    timer has_hit_timer(40);
 
     //tạo ra player
     player slimebuck(20, 0, 1);
