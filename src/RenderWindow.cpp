@@ -57,8 +57,8 @@ void RenderWindow::render_background(background &p_background) {
 	src.h = p_background.getBackground().h;
 
 	SDL_Rect dst;
-	dst.x = p_background.getBackground().x;
-	dst.y = p_background.getBackground().y;
+	dst.x = p_background.getPos().x;
+	dst.y = p_background.getPos().y;
 	dst.w = p_background.getBackground().w;
 	dst.h = p_background.getBackground().h;
 	SDL_RenderCopy(renderer, p_background.getTex(), &src, &dst);

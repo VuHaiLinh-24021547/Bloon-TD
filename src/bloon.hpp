@@ -9,6 +9,7 @@
 
 #include "position.hpp"
 #include "player.hpp"
+#include "music.hpp"
 
 class bloon
 {
@@ -30,6 +31,8 @@ class bloon
     private:
         vectorR2 pos;
         SDL_Rect bloon_tex;
+
+        Music* bloon_pop_sound = new Music("music/bloon_pop_sound.wav");
         
         int move;
         int health;

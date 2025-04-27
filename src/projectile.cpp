@@ -10,7 +10,7 @@
 const int dart_w = 20;
 const int dart_h = 16;
 
-projectile::projectile(vectorR2 p_pos, SDL_Texture* p_tex, vectorR2 target_pos)
+projectile::projectile(vectorR2 p_pos, SDL_Texture* p_tex, const vectorR2 &target_pos)
 :pos(p_pos), tex(p_tex) {
     dart_tex.x = 0;
     dart_tex.y = 0;

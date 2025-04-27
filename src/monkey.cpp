@@ -8,6 +8,7 @@
 #include "player.hpp"
 #include "bloon.hpp"
 #include "projectile.hpp"
+#include "music.hpp"
 
 
 const int monkey_w = 60;
@@ -20,6 +21,7 @@ monkey::monkey(vectorR2 p_pos, SDL_Texture* p_tex)
     monkey_tex.y = 0;
     monkey_tex.w = monkey_w;
     monkey_tex.h = monkey_h;
+
 }
 
 SDL_Texture* monkey::getTex() {
@@ -65,7 +67,6 @@ int monkey::getRange() {
 
 bool monkey::shoot(player& p_player) {
     bool shoot = false;
-    time_since_last_shot++;
 
     if(target && target->alive()) {
         float dx = target->getPos().x - pos.x;
@@ -86,10 +87,12 @@ bool monkey::shoot(player& p_player) {
         }
         else {
             target = nullptr;
+            shoot = false;
         }
     }
     else {
         target = nullptr;
+        shoot = false;
     }
     return shoot;
 }

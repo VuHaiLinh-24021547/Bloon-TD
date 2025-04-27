@@ -4,16 +4,16 @@
 
 #include "background.hpp"
 
-const int background_w = 1280;
-const int background_h = 720;
-
-background::background(int x, int y, SDL_Texture* tex)
-    :x(x), y(y), tex(tex)
+background::background(int x, int y, int w, int h, SDL_Texture* tex)
+    :x(x), y(y), w(w), h(h), tex(tex)
 {
-    size.x = x;
-    size.y = y;
-    size.w = background_w;
-    size.h = background_h;
+    size.x = 0;
+    size.y = 0;
+    size.w = w;
+    size.h = h;
+
+    pos.x = x;
+    pos.y = y;
 }   
 
 SDL_Rect background::getBackground() {
@@ -22,4 +22,8 @@ SDL_Rect background::getBackground() {
 
 SDL_Texture* background::getTex() {
     return tex;
+}
+
+vectorR2& background::getPos() {
+    return pos;
 }

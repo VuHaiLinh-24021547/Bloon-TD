@@ -11,6 +11,7 @@
 #include "timer.hpp"
 #include "monkey.hpp"
 #include "projectile.hpp"
+#include "music.hpp"
 
 const int window_w = 1280;
 const int window_h = 720;
@@ -30,7 +31,16 @@ int main(int argc, char *argv[]){
     
     //tạo ra background
     SDL_Texture* background_tex = window.loadTexture("res/gfx/background.png");
-    background bg(0, 0, background_tex);
+    background bg(0, 0, 1280, 720, background_tex);
+
+    SDL_Texture* start_background_tex = window.loadTexture("res/gfx/start_background.png");
+    background start_bg(0, 0, 1280, 720, start_background_tex);
+
+    SDL_Texture* end_screen_tex = window.loadTexture("res/gfx/end_screen.png");
+    background end_screen(150, 400, 500, 121, end_screen_tex);
+
+    SDL_Texture* lose_screen_tex = window.loadTexture("res/gfx/lose_screen.png");
+    background lose_screen(150, 170, 545, 457, lose_screen_tex);
 
     //tạo ra bloon
     SDL_Texture* red_bloon_tex = window.loadTexture("res/gfx/red_bloon.png");
@@ -59,12 +69,20 @@ int main(int argc, char *argv[]){
     //timer
     timer spawn_timer(100);
     timer round_timer(10);
-    timer has_hit_timer(50);
+    timer has_hit_timer(30);
 
     //tạo ra player
-    player slimebuck(20, 75, 1);
+    player slimebuck(20, 0, 1);
+
+    //tạo music 
+    Music* main_theme;
+    main_theme = new Music("music/Btd 6 Main Theme.mp3");
+    main_theme->playMusic(-1);
 
     bool gameRunning = true;
+    bool gameStarted = false;
+    bool win = false;
+    bool gameEnded = false;
 
     int mouse_x, mouse_y;
 
@@ -78,6 +96,36 @@ int main(int argc, char *argv[]){
 				gameRunning = false;
             if(event.type == SDL_MOUSEMOTION) {
                 SDL_GetMouseState(&mouse_x, &mouse_y);
+            }
+
+            //start game
+            if(event.type == SDL_KEYDOWN) {
+                if(event.key.keysym.sym == SDLK_SPACE && !gameStarted) {
+                    gameStarted = true;
+                    slimebuck.modify_money(75);
+                }
+                else if(event.key.keysym.sym == SDLK_r && gameEnded) {
+                    gameEnded = false;
+
+                    slimebuck.money = 75;
+                    slimebuck.health = 20;
+                    slimebuck.round = 1;
+
+                    for(int i=0; i<(int)bloon_v.size(); i++) {
+                        bloon_v.erase(bloon_v.begin() + i);
+                    }
+                    for(int i=0; i<(int)dart_monkey_v.size(); i++) {
+                        dart_monkey_v.erase(dart_monkey_v.begin() + i);
+                    }
+                    for(int i=0; i<(int)dart_v.size(); i++) {
+                        dart_v.erase(dart_v.begin() + i);
+                    }
+
+                    bloon_count = 15;
+                    spawn_timer.get_time_to_max();
+                    round_timer.get_time_to_max();
+                    has_hit_timer.get_time_to_max();
+                }
             }
 
             //đặt monkey
@@ -97,14 +145,12 @@ int main(int argc, char *argv[]){
             }
 
             //bán monkey
-            if(event.type == SDL_MOUSEBUTTONDOWN) {
-                if(event.button.button == SDL_BUTTON_RIGHT) {
-                    for(int i=0; i<(int)dart_monkey_v.size(); i++) {
-                        if(dart_monkey_v[i].getPos().x <= mouse_x && dart_monkey_v[i].getPos().x + 60 >= mouse_x &&
-                           dart_monkey_v[i].getPos().y <= mouse_y && dart_monkey_v[i].getPos().y + 60 >= mouse_y) {
-                            dart_monkey_v.erase(dart_monkey_v.begin() + i);
-                            slimebuck.modify_money(25);
-                        }
+            if(event.button.button == SDL_BUTTON_RIGHT) {
+                for(int i=0; i<(int)dart_monkey_v.size(); i++) {
+                    if(dart_monkey_v[i].getPos().x <= mouse_x && dart_monkey_v[i].getPos().x + 60 >= mouse_x &&
+                       dart_monkey_v[i].getPos().y <= mouse_y && dart_monkey_v[i].getPos().y + 60 >= mouse_y) {
+                        dart_monkey_v.erase(dart_monkey_v.begin() + i);
+                        slimebuck.modify_money(25);
                     }
                 }
             }
@@ -127,56 +173,58 @@ int main(int argc, char *argv[]){
         
         window.render_status(slimebuck);
 
-        //spawn bloons theo round
+        
+        if(gameStarted && !gameEnded) {
+            //spawn bloons theo round
+            spawn_timer.time_passed();
+            switch(slimebuck.round) {
+                case 1:
+                    create_bloon(bloon_count, 0, bloon_v, spawn_timer, 1);
+                    break;
+                case 2:
+                    create_bloon(bloon_count, 5, bloon_v, spawn_timer, 1);
+                    create_bloon(bloon_count, 0, bloon_v, spawn_timer, 2);
+                    break;
+                case 3:
+                    create_bloon(bloon_count, 7, bloon_v, spawn_timer, 1);
+                    create_bloon(bloon_count, 0, bloon_v, spawn_timer, 3);
+                    break;
+                case 4:
+                    create_bloon(bloon_count, 0, bloon_v, spawn_timer, 2);
+                    break;
+                case 5:
+                    create_bloon(bloon_count, 6, bloon_v, spawn_timer, 2);
+                    create_bloon(bloon_count, 0, bloon_v, spawn_timer, 3);
+                    break;
+                case 6:
+                    create_bloon(bloon_count, 4, bloon_v, spawn_timer, 2);
+                    create_bloon(bloon_count, 0, bloon_v, spawn_timer, 4);
+                    break;
+                case 7:
+                    create_bloon(bloon_count, 0, bloon_v, spawn_timer, 3);
+                    break;
+                case 8:
+                    create_bloon(bloon_count, 10, bloon_v, spawn_timer, 2);
+                    create_bloon(bloon_count, 0, bloon_v, spawn_timer, 4);
+                    break;
+                case 9:
+                    create_bloon(bloon_count, 6, bloon_v, spawn_timer, 3);
+                    create_bloon(bloon_count, 0, bloon_v, spawn_timer, 4);
+                    break;
+                case 10:
+                    create_bloon(bloon_count, 0, bloon_v, spawn_timer, 4);
+                    break;
+            }
 
-        spawn_timer.time_passed();
-        switch(slimebuck.round) {
-            case 1:
-                create_bloon(bloon_count, 0, bloon_v, spawn_timer, 1);
-                break;
-            case 2:
-                create_bloon(bloon_count, 5, bloon_v, spawn_timer, 1);
-                create_bloon(bloon_count, 0, bloon_v, spawn_timer, 2);
-                break;
-            case 3:
-                create_bloon(bloon_count, 7, bloon_v, spawn_timer, 1);
-                create_bloon(bloon_count, 0, bloon_v, spawn_timer, 3);
-                break;
-            case 4:
-                create_bloon(bloon_count, 0, bloon_v, spawn_timer, 2);
-                break;
-            case 5:
-                create_bloon(bloon_count, 6, bloon_v, spawn_timer, 2);
-                create_bloon(bloon_count, 0, bloon_v, spawn_timer, 3);
-                break;
-            case 6:
-                create_bloon(bloon_count, 4, bloon_v, spawn_timer, 2);
-                create_bloon(bloon_count, 0, bloon_v, spawn_timer, 4);
-                break;
-            case 7:
-                create_bloon(bloon_count, 0, bloon_v, spawn_timer, 3);
-                break;
-            case 8:
-                create_bloon(bloon_count, 10, bloon_v, spawn_timer, 2);
-                create_bloon(bloon_count, 0, bloon_v, spawn_timer, 4);
-                break;
-            case 9:
-                create_bloon(bloon_count, 6, bloon_v, spawn_timer, 3);
-                create_bloon(bloon_count, 0, bloon_v, spawn_timer, 4);
-                break;
-            case 10:
-                create_bloon(bloon_count, 0, bloon_v, spawn_timer, 4);
-                break;
-        }
-
-        //qua round mới
-        if(bloon_v.empty() && bloon_count == 0) {
-            round_timer.time_passed();
-            if(round_timer.time_is_zero() && slimebuck.round <= 10) {
-                slimebuck.modify_round();
-                round_timer.get_time_to_max();  
-                bloon_count = 15;         
-            } 
+            //qua round mới
+            if(bloon_v.empty() && bloon_count == 0) {
+                round_timer.time_passed();
+                if(round_timer.time_is_zero() && slimebuck.round <= 10) {
+                    slimebuck.modify_round();
+                    round_timer.get_time_to_max();  
+                    bloon_count = 15;         
+                } 
+            }
         }
 
         //bloons do stuff
@@ -192,8 +240,8 @@ int main(int argc, char *argv[]){
                 bloon_v[i].bloon_move();
 
                 if(bloon_v[i].bloon_reach_end()) {
-                    slimebuck.modify_health(-1);
-                    slimebuck.modify_money(1);
+                    slimebuck.modify_health(-bloon_v[i].getHealth());
+                    slimebuck.modify_money(bloon_v[i].getHealth());
                 }
             }
         }
@@ -201,6 +249,7 @@ int main(int argc, char *argv[]){
         //render dart monkey 
         for(auto &dart_monkey : dart_monkey_v) {
             window.render_monkey(dart_monkey);
+            dart_monkey.time_since_last_shot ++;
         }
 
         //render dart projectile
@@ -215,7 +264,7 @@ int main(int argc, char *argv[]){
             }
 
             // tạo ra dart khi dart monkey bắn
-            if(dart_monkey.can_shoot && dart_monkey.shoot(slimebuck)) {
+            if(dart_monkey.target != nullptr && dart_monkey.can_shoot && dart_monkey.shoot(slimebuck)) {
                 projectile darts(vectorR2(dart_monkey.getPos().x+30, dart_monkey.getPos().y+30), dart_texture, dart_monkey.target->getPos());
                 dart_v.push_back(darts);
             }
@@ -257,15 +306,46 @@ int main(int argc, char *argv[]){
             else continue;
         }
 
+        if(!gameStarted) {
+            window.render_background(start_bg);
+        }
+
+        if(slimebuck.round == 10 && bloon_v.empty()) {
+            gameEnded = true;
+            win = true;
+        }
+
+        if(slimebuck.health <= 0) {
+            gameEnded = true;
+            win = false;
+            for(int i=0; i<(int)bloon_v.size(); i++) {
+                bloon_v.erase(bloon_v.begin() + i);
+            }
+        }
+
+        if (gameEnded) {
+            if(win) {
+                window.render_background(end_screen);
+            }
+            else {
+                window.render_background(lose_screen);
+            }
+        }
+
+
+
         window.display();
 
         SDL_Delay(8);
 
     } 
+
     window.cleanUp();
     TTF_Quit();
     IMG_Quit();
     SDL_Quit();
+
+    main_theme->~Music();
     
     return 0;
 }

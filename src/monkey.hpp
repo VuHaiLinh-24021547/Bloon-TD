@@ -28,6 +28,7 @@ class monkey
         int getRange();
         std::vector<projectile> dart_v;
         void move(const int &x, const int &y);
+        int time_since_last_shot = 1000;
     private:
         vectorR2 pos;
         SDL_Texture* tex;
@@ -36,8 +37,6 @@ class monkey
         int cost = 50;
         int damage;
         int fire_cooldown = 100;
-        int time_since_last_shot = 1000;
-
 };
 
 #endif

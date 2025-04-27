@@ -54,7 +54,9 @@ int bloon::getHealth() {
 void bloon::bloon_pop(player& p_player) {
     health--;
     p_player.modify_money(1);
+    bloon_pop_sound->playPopSound();
 }
+
 void bloon::bloon_move() {
     if(move == 1) {
         if(pos.x < 610.0f && pos.y == 280.0f) {

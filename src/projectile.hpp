@@ -13,7 +13,7 @@
 
 class projectile{
     public:
-        projectile(vectorR2 p_pos, SDL_Texture* p_tex, vectorR2 target_pos);
+        projectile(vectorR2 p_pos, SDL_Texture* p_tex, const vectorR2 &target_pos);
         SDL_Texture* getTex();
         SDL_Rect getDart();
         vectorR2 &getPos();
